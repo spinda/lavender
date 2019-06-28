@@ -186,7 +186,7 @@ VERSION_TO_FEATURES: Dict[TargetVersion, Set[Feature]] = {
 class FileMode:
     target_versions: Set[TargetVersion] = Factory(set)
     line_length: int = DEFAULT_LINE_LENGTH
-    string_normalization: bool = True
+    string_normalization: str = "single"
     is_pyi: bool = False
 
     def get_cache_key(self) -> str:
@@ -200,7 +200,7 @@ class FileMode:
         parts = [
             version_str,
             str(self.line_length),
-            str(int(self.string_normalization)),
+            self.string_normalization,
             str(int(self.is_pyi)),
         ]
         return ".".join(parts)
@@ -286,10 +286,10 @@ def read_pyproject_toml(
     ),
 )
 @click.option(
-    "-S",
-    "--skip-string-normalization",
-    is_flag=True,
-    help="Don't normalize string quotes or prefixes.",
+    "--string-normalization",
+    type=click.Choice(["none", "single", "double"]),
+    default="single",
+    help="Normalize strings to single quotes, double quotes, or leave as-is.",
 )
 @click.option(
     "--check",
@@ -382,7 +382,7 @@ def main(
     fast: bool,
     pyi: bool,
     py36: bool,
-    skip_string_normalization: bool,
+    string_normalization: str,
     quiet: bool,
     verbose: bool,
     include: str,
@@ -411,7 +411,7 @@ def main(
         target_versions=versions,
         line_length=line_length,
         is_pyi=pyi,
-        string_normalization=not skip_string_normalization,
+        string_normalization=string_normalization,
     )
     if config and verbose:
         out(f"Using configuration from {config}.", bold=False, fg="blue")
@@ -733,7 +733,7 @@ def format_str(src_contents: str, *, mode: FileMode) -> FileContent:
         remove_u_prefix="unicode_literals" in future_imports
         or supports_feature(versions, Feature.UNICODE_LITERALS),
         is_pyi=mode.is_pyi,
-        normalize_strings=mode.string_normalization,
+        string_normalization=mode.string_normalization,
     )
     elt = EmptyLineTracker(is_pyi=mode.is_pyi)
     empty_line = Line()
@@ -1677,7 +1677,7 @@ class LineGenerator(Visitor[Line]):
     """
 
     is_pyi: bool = False
-    normalize_strings: bool = True
+    string_normalization: str = "single"
     current_line: Line = Factory(Line)
     remove_u_prefix: bool = False
 
@@ -1718,9 +1718,9 @@ class LineGenerator(Visitor[Line]):
                     yield from self.line()
 
             normalize_prefix(node, inside_brackets=any_open_brackets)
-            if self.normalize_strings and node.type == token.STRING:
+            if self.string_normalization != "none" and node.type == token.STRING:
                 normalize_string_prefix(node, remove_u_prefix=self.remove_u_prefix)
-                normalize_string_quotes(node)
+                normalize_string_quotes(node, self.string_normalization)
             if node.type == token.NUMBER:
                 normalize_numeric_literal(node)
             if node.type not in WHITESPACE:
@@ -2815,27 +2815,37 @@ def normalize_string_prefix(leaf: Leaf, remove_u_prefix: bool = False) -> None:
     leaf.value = f"{new_prefix}{match.group(2)}"
 
 
-def normalize_string_quotes(leaf: Leaf) -> None:
-    """Prefer double quotes but only if it doesn't cause more escaping.
+def normalize_string_quotes(leaf: Leaf, string_normalization: str = "single") -> None:
+    """Prefer the specified quote option but only if it doesn't cause more escaping.
 
     Adds or removes backslashes as appropriate. Doesn't parse and fix
     strings nested in f-strings (yet).
 
     Note: Mutates its argument.
     """
+
+    desired_quote = "'" if string_normalization == "single" else '"'
+    undesired_quote = '"' if string_normalization == "single" else '"'
+
+    triple_desired_quote = desired_quote * 3
+    triple_undesired_quote = undesired_quote * 3
+
+    escaped_desired_quote = "\\" + desired_quote
+    escaped_undesired_quote = "\\" + undesired_quote
+
     value = leaf.value.lstrip("furbFURB")
-    if value[:3] == '"""':
+    if value[:3] == triple_desired_quote:
         return
 
-    elif value[:3] == "'''":
-        orig_quote = "'''"
-        new_quote = '"""'
-    elif value[0] == '"':
-        orig_quote = '"'
-        new_quote = "'"
+    elif value[:3] == triple_undesired_quote:
+        orig_quote = triple_undesired_quote
+        new_quote = triple_desired_quote
+    elif value[0] == desired_quote:
+        orig_quote = desired_quote
+        new_quote = undesired_quote
     else:
-        orig_quote = "'"
-        new_quote = '"'
+        orig_quote = undesired_quote
+        new_quote = desired_quote
     first_quote_pos = leaf.value.find(orig_quote)
     if first_quote_pos == -1:
         return  # There's an internal error
@@ -2877,16 +2887,16 @@ def normalize_string_quotes(leaf: Leaf) -> None:
                 # Do not introduce backslashes in interpolated expressions
                 return
 
-    if new_quote == '"""' and new_body[-1:] == '"':
+    if new_quote == triple_desired_quote and new_body[-1:] == desired_quote:
         # edge case:
-        new_body = new_body[:-1] + '\\"'
+        new_body = new_body[:-1] + escaped_desired_quote
     orig_escape_count = body.count("\\")
     new_escape_count = new_body.count("\\")
     if new_escape_count > orig_escape_count:
         return  # Do not introduce more escaping
 
-    if new_escape_count == orig_escape_count and orig_quote == '"':
-        return  # Prefer double quotes
+    if new_escape_count == orig_escape_count and orig_quote == desired_quote:
+        return  # Prefer desired quote option
 
     leaf.value = f"{prefix}{new_quote}{new_body}{new_quote}"
 

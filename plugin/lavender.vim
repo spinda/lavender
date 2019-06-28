@@ -36,8 +36,8 @@ endif
 if !exists("g:lavender_linelength")
   let g:lavender_linelength = 99
 endif
-if !exists("g:lavender_skip_string_normalization")
-  let g:lavender_skip_string_normalization = 0
+if !exists("g:lavender_string_normalization")
+  let g:lavender_string_normalization = "single"
 endif
 
 python3 << endpython3
@@ -111,7 +111,7 @@ def Lavender():
   fast = bool(int(vim.eval("g:lavender_fast")))
   mode = lavender.FileMode(
     line_length=int(vim.eval("g:lavender_linelength")),
-    string_normalization=not bool(int(vim.eval("g:lavender_skip_string_normalization"))),
+    string_normalization=vim.eval("g:lavender_string_normalization"),
     is_pyi=vim.current.buffer.name.endswith('.pyi'),
   )
   buffer_str = '\n'.join(vim.current.buffer) + '\n'
