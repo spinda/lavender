@@ -1,44 +1,10 @@
-# Example configuration for Black.
-
-# NOTE: you have to use single-quoted strings in TOML for regular expressions.
-# It's the equivalent of r-strings in Python.  Multiline strings are treated as
-# verbose regular expressions by Black.  Use [ ] to denote a significant space
-# character.
-
-[tool.black]
-line-length = 88
-target_version = ['py36', 'py37', 'py38']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-
-  # The following are specific to Black, you probably don't want those.
-  | blib2to3
-  | tests/data
-  | profiling
-)/
-'''
-
-
-# Poetry package information below.
-# NOTE: You don't need this in your own Black configuration.
-
 [tool.poetry]
-name = "black"
-version = "19.3b0"
-description = "The uncompromising code formatter."
+name = "lavender"
+version = "0.1.0"
+description = "The slightly more compromising code formatter."
 readme = "README.md"
 authors = [
+    "Michael Smith <michael@spinda.net>",
     "Łukasz Langa <lukasz@langa.pl>",
     "Carol Willing <carolcode@willingconsulting.com>",
     "Carl Meyer <carl@oddbird.net>",
@@ -46,8 +12,7 @@ authors = [
     "Mika Naylor <mail@autophagy.io>",
     "Zsolt Dollenstein <zsol.zsol@gmail.com>",
 ]
-homepage = "https://github.com/ambv/black/"
-documentation = "https://black.readthedocs.io/en/stable/"
+homepage = "https://github.com/spinda/lavender/"
 license = "MIT"
 keywords = ["automation", "formatter", "yapf", "autopep8", "gofmt"]
 classifiers=[
@@ -60,13 +25,13 @@ classifiers=[
 ]
 
 packages = [
-    {include = "black.py"},
+    {include = "lavender.py"},
     {include = "blib2to3"}
 ]
 
 [tool.poetry.scripts]
-black = "black:main"
-# blackd = "blackd:main"  # TODO: how to make this only appear on `poetry install -E d`?
+lavender = "lavender:main"
+# lavenderd = "lavenderd:main"  # TODO: how to make this only appear on `poetry install -E d`?
 
 [tool.poetry.dependencies]
 python = "^3.6"
@@ -89,3 +54,26 @@ flake8-mypy = "^17.8"
 mypy = "^0.620"
 readme_renderer = "^21.0"
 recommonmark = "^0.4.0"
+
+[tool.black]
+line-length = 88
+target_version = ['py36', 'py37', 'py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+
+  # The following are specific to Lavender:
+  | blib2to3
+  | profiling
+)/
+'''
