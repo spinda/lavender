@@ -34,7 +34,7 @@ if !exists("g:lavender_fast")
   let g:lavender_fast = 0
 endif
 if !exists("g:lavender_linelength")
-  let g:lavender_linelength = 88
+  let g:lavender_linelength = 99
 endif
 if !exists("g:lavender_skip_string_normalization")
   let g:lavender_skip_string_normalization = 0
