@@ -56,7 +56,7 @@ class Leaf(Base):
     value: Text
     fixers_applied: List[Any]
     def __init__(self, type: int, value: Text, context: Optional[_Context] = ..., prefix: Optional[Text] = ..., fixers_applied: List[Any] = ...) -> None: ...
-    # bolted on attributes by Black
+    # bolted on attributes by Lavender
     bracket_depth: int
     opening_bracket: Leaf
 
