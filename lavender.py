@@ -187,6 +187,7 @@ class FileMode:
     target_versions: Set[TargetVersion] = Factory(set)
     line_length: int = DEFAULT_LINE_LENGTH
     string_normalization: str = "single"
+    special_case_def_empty_lines: bool = False
     is_pyi: bool = False
 
     def get_cache_key(self) -> str:
@@ -201,6 +202,7 @@ class FileMode:
             version_str,
             str(self.line_length),
             self.string_normalization,
+            str(int(self.special_case_def_empty_lines)),
             str(int(self.is_pyi)),
         ]
         return ".".join(parts)
@@ -290,6 +292,13 @@ def read_pyproject_toml(
     type=click.Choice(["none", "single", "double"]),
     default="single",
     help="Normalize strings to single quotes, double quotes, or leave as-is.",
+)
+@click.option(
+    "--special-case-def-empty-lines",
+    is_flag=True,
+    help=(
+        "Treat empty lines between classes and defs differently from other code, inserting double empty lines where appropriate."
+    ),
 )
 @click.option(
     "--check",
@@ -383,6 +392,7 @@ def main(
     pyi: bool,
     py36: bool,
     string_normalization: str,
+    special_case_def_empty_lines: bool,
     quiet: bool,
     verbose: bool,
     include: str,
@@ -412,6 +422,7 @@ def main(
         line_length=line_length,
         is_pyi=pyi,
         string_normalization=string_normalization,
+        special_case_def_empty_lines=special_case_def_empty_lines,
     )
     if config and verbose:
         out(f"Using configuration from {config}.", bold=False, fg="blue")
@@ -735,7 +746,10 @@ def format_str(src_contents: str, *, mode: FileMode) -> FileContent:
         is_pyi=mode.is_pyi,
         string_normalization=mode.string_normalization,
     )
-    elt = EmptyLineTracker(is_pyi=mode.is_pyi)
+    elt = EmptyLineTracker(
+        is_pyi=mode.is_pyi,
+        special_case_def_empty_lines=mode.special_case_def_empty_lines,
+    )
     empty_line = Line()
     after = 0
     split_line_features = {
@@ -1562,6 +1576,7 @@ class EmptyLineTracker:
     """
 
     is_pyi: bool = False
+    special_case_def_empty_lines: bool = False
     previous_line: Optional[Line] = None
     previous_after: int = 0
     previous_defs: List[int] = Factory(list)
@@ -1603,7 +1618,9 @@ class EmptyLineTracker:
                 before = 0 if depth else 1
             else:
                 before = 1 if depth else 2
-        if current_line.is_decorator or current_line.is_def or current_line.is_class:
+        if self.special_case_def_empty_lines and (
+            current_line.is_decorator or current_line.is_def or current_line.is_class
+        ):
             return self._maybe_empty_lines_for_class_or_def(current_line, before)
 
         if (

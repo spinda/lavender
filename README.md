@@ -10,6 +10,9 @@ A slightly more compromising Python code formatter, based on the latest stable r
 - The default line length is 99 instead of 88 (configurable with `--line-length`).
 - Single quoted strings are preferred (configurable with
  `--string-normalization none/single/double`).
+- Empty lines between `class`es and `def`s are treated no differently from other code. The old
+  behavior, which sometimes inserts double empty lines between them, remains available via
+  `--special-case-def-empty-lines`.
 
 ## Documentation
 
