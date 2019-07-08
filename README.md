@@ -34,3 +34,8 @@ License for more details.
 
 You should have received a [copy](LICENSE) of the MIT License along with this program. If not, see
 [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT).
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in
+this work by you shall be licensed as above, without any additional terms or conditions.
