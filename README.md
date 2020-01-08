@@ -13,6 +13,8 @@ A slightly more compromising Python code formatter, based on the latest stable r
 - Empty lines between `class`es and `def`s are treated no differently from other code. The old
   behavior, which sometimes inserts double empty lines between them, remains available via
   `--special-case-def-empty-lines`.
+- The Vim plugin configuration variable for line length is named `g:lavender_line_length` instead
+  of `g:lavender_linelength`, for consistency with the other configuration variable names.
 
 ## Documentation
 
