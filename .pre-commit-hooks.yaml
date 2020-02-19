@@ -1,6 +1,6 @@
 - id: lavender
   name: lavender
-  description: "Lavender: The uncompromising Python code formatter"
+  description: "Lavender: Python code formatter"
   entry: lavender
   language: python
   language_version: python3
