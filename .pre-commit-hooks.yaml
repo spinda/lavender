@@ -1,0 +1,9 @@
+- id: lavender
+  name: lavender
+  description: "Lavender: The uncompromising Python code formatter"
+  entry: lavender
+  language: python
+  language_version: python3
+  require_serial: true
+  types: [python]
+
