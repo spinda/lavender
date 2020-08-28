@@ -1,7 +1,10 @@
 # Copyright (C) 2018 Łukasz Langa
 # Copyright (C) 2019-2020 Michael Smith
-from setuptools import setup
+import ast
+import re
 import sys
+
+from setuptools import setup
 
 assert sys.version_info >= (3, 6, 0), "lavender requires Python 3.6+"
 from pathlib import Path  # noqa E402
