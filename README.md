@@ -6,6 +6,10 @@ A slightly more compromising Python code formatter, based on the latest stable r
 [Black](https://github.com/python/black#readme)
 ([`20.8b10`](https://github.com/psf/black/releases/tag/20.8b1) at the time of writing).
 
+## Differences from Black
+
+- The default line length is 99 instead of 88 (configurable with `--line-length`).
+
 ## Documentation
 
 Read up on [Black](https://github.com/python/black#readme), but replace `black` with `lavender` in your
