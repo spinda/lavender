@@ -1,38 +1,69 @@
-# Example configuration for Black.
+[tool.poetry]
+name = "lavender"
+version = "0.2.0"
+description = "The slightly more compromising code formatter."
+license = "MIT"
+authors = ["Michael Smith <michael@spinda.net>"]
+readme = "README.md"
+homepage = "https://github.com/spinda/lavender"
+repository = "https://github.com/spinda/lavender.git"
+keywords = ["automation", "formatter", "black", "yapf", "autopep8"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: Quality Assurance",
+]
+packages = [
+  { include = "lavender", from = "src" },
+  { include = "lavenderd", from = "src" },
+  { include = "llib2to3", from = "src" },
+]
 
-# NOTE: you have to use single-quoted strings in TOML for regular expressions.
-# It's the equivalent of r-strings in Python.  Multiline strings are treated as
-# verbose regular expressions by Black.  Use [ ] to denote a significant space
-# character.
+[tool.poetry.scripts]
+lavender = "lavender:patched_main"
 
-[tool.black]
-line-length = 88
-target-version = ['py36', 'py37', 'py38']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
+[tool.poetry.scripts.lavenderd]
+callable = "lavenderd:patched_main"
+extras = ["d"]
 
-  # The following are specific to Black, you probably don't want those.
-  | blib2to3
-  | tests/data
-  | profiling
-)/
-'''
+[tool.poetry.dependencies]
+python = "^3.6"
+appdirs = "^1.4.0"
+click = "^7.1.2"
+mypy_extensions = "^0.4.3"
+pathspec = ">=0.6.0, <0.9"
+regex = ">=2020.1.8"
+toml = "^0.10.1"
+typed-ast = "^1.4.0"
+typing_extensions = "^3.7.4"
 
+[tool.poetry.dependencies.aiohttp]
+version = "^3.3.2"
+optional = true
 
-# Build system information below.
-# NOTE: You don't need this in your own Black configuration.
+[tool.poetry.dependencies.aiohttp_cors]
+version = "^0.7.0"
+optional = true
 
-[build-system]
-requires = ["setuptools>=41.0", "setuptools-scm", "wheel"]
-build-backend = "setuptools.build_meta"
+[tool.poetry.dependencies.colorama]
+version = "^0.4.3"
+optional = true
+
+[tool.poetry.dependencies.dataclasses]
+version = ">=0.6, <0.9"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.800"
+
+[tool.poetry.extras]
+d = ["aiohttp", "aiohttp_cors"]

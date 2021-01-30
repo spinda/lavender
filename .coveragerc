@@ -1,5 +1,0 @@
-[report]
-omit =
-  src/blib2to3/*
-  tests/data/*
-  */site-packages/*
