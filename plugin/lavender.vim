@@ -41,8 +41,8 @@ endif
 if !exists("g:lavender_linelength")
   let g:lavender_linelength = 99
 endif
-if !exists("g:lavender_skip_string_normalization")
-  let g:lavender_skip_string_normalization = 0
+if !exists("g:lavender_string_normalization")
+  let g:lavender_string_normalization = "single"
 endif
 
 python3 << EndPython3
@@ -62,15 +62,13 @@ class Flag(collections.namedtuple("FlagBase", "name, cast")):
     name = self.var_name
     if name == "line_length":
       name = name.replace("_", "")
-    if name == "string_normalization":
-      name = "skip_" + name
     return "g:lavender_" + name
 
 
 FLAGS = [
   Flag(name="line_length", cast=int),
   Flag(name="fast", cast=bool),
-  Flag(name="string_normalization", cast=bool),
+  Flag(name="string_normalization", cast=str),
 ]
 
 

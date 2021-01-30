@@ -5,7 +5,7 @@ description = "The slightly more compromising code formatter."
 license = "MIT"
 authors = ["Michael Smith <michael@spinda.net>"]
 readme = "README.md"
-homepage = "https://github.com/spinda/lavender"
+homepage = "https://github.com/spinda/lavender#readme"
 repository = "https://github.com/spinda/lavender.git"
 keywords = ["automation", "formatter", "black", "yapf", "autopep8"]
 classifiers = [
@@ -67,3 +67,12 @@ mypy = "^0.800"
 
 [tool.poetry.extras]
 d = ["aiohttp", "aiohttp_cors"]
+
+[tool.lavender]
+target-version = ["py36"]
+line-length = 88
+string-normalization = "double"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

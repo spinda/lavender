@@ -22,7 +22,7 @@ _stop_signal = asyncio.Event()
 PROTOCOL_VERSION_HEADER = "X-Protocol-Version"
 LINE_LENGTH_HEADER = "X-Line-Length"
 PYTHON_VARIANT_HEADER = "X-Python-Variant"
-SKIP_STRING_NORMALIZATION_HEADER = "X-Skip-String-Normalization"
+STRING_NORMALIZATION_HEADER = "X-String-Normalization"
 FAST_OR_SAFE_HEADER = "X-Fast-Or-Safe"
 DIFF_HEADER = "X-Diff"
 
@@ -30,7 +30,7 @@ LAVENDER_HEADERS = [
     PROTOCOL_VERSION_HEADER,
     LINE_LENGTH_HEADER,
     PYTHON_VARIANT_HEADER,
-    SKIP_STRING_NORMALIZATION_HEADER,
+    STRING_NORMALIZATION_HEADER,
     FAST_OR_SAFE_HEADER,
     DIFF_HEADER,
 ]
@@ -102,9 +102,16 @@ async def handle(request: web.Request, executor: Executor) -> web.Response:
             pyi = False
             versions = set()
 
-        skip_string_normalization = bool(
-            request.headers.get(SKIP_STRING_NORMALIZATION_HEADER, False)
-        )
+        try:
+            string_normalization = lavender.StringNormalization.from_configuration(
+                request.headers.get(STRING_NORMALIZATION_HEADER, "single")
+            )
+        except ValueError:
+            return web.Response(
+                status=400,
+                text="Invalid string normalization header value",
+            )
+
         fast = False
         if request.headers.get(FAST_OR_SAFE_HEADER, "safe") == "fast":
             fast = True
@@ -112,7 +119,7 @@ async def handle(request: web.Request, executor: Executor) -> web.Response:
             target_versions=versions,
             is_pyi=pyi,
             line_length=line_length,
-            string_normalization=not skip_string_normalization,
+            string_normalization=string_normalization,
         )
         req_bytes = await request.content.read()
         charset = request.charset if request.charset is not None else "utf8"
@@ -121,7 +128,8 @@ async def handle(request: web.Request, executor: Executor) -> web.Response:
 
         loop = asyncio.get_event_loop()
         formatted_str = await loop.run_in_executor(
-            executor, partial(lavender.format_file_contents, req_str, fast=fast, mode=mode)
+            executor,
+            partial(lavender.format_file_contents, req_str, fast=fast, mode=mode),
         )
 
         # Only output the diff in the HTTP response

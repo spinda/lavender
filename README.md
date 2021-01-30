@@ -9,6 +9,8 @@ A slightly more compromising Python code formatter, based on the latest stable r
 ## Differences from Black
 
 - The default line length is 99 instead of 88 (configurable with `--line-length`).
+- Single quoted strings are preferred (configurable with
+ `--string-normalization none/single/double`).
 
 ## Documentation
 
