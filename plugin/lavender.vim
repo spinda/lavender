@@ -38,8 +38,8 @@ endif
 if !exists("g:lavender_fast")
   let g:lavender_fast = 0
 endif
-if !exists("g:lavender_linelength")
-  let g:lavender_linelength = 99
+if !exists("g:lavender_line_length")
+  let g:lavender_line_length = 99
 endif
 if !exists("g:lavender_string_normalization")
   let g:lavender_string_normalization = "single"
@@ -63,8 +63,6 @@ class Flag(collections.namedtuple("FlagBase", "name, cast")):
   @property
   def vim_rc_name(self):
     name = self.var_name
-    if name == "line_length":
-      name = name.replace("_", "")
     return "g:lavender_" + name
 
 
