@@ -72,6 +72,7 @@ d = ["aiohttp", "aiohttp_cors"]
 [tool.lavender]
 target-version = ["py36"]
 line-length = 88
+string-normalization = "double"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
