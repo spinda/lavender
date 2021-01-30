@@ -73,6 +73,7 @@ d = ["aiohttp", "aiohttp_cors"]
 target-version = ["py36"]
 line-length = 88
 string-normalization = "double"
+special-case-def-empty-lines = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

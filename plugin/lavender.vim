@@ -44,6 +44,9 @@ endif
 if !exists("g:lavender_string_normalization")
   let g:lavender_string_normalization = "single"
 endif
+if !exists("g:lavender_special_case_def_empty_lines")
+  let g:lavender_special_case_def_empty_lines = 0
+endif
 
 python3 << EndPython3
 import collections
@@ -69,6 +72,7 @@ FLAGS = [
   Flag(name="line_length", cast=int),
   Flag(name="fast", cast=bool),
   Flag(name="string_normalization", cast=str),
+  Flag(name="special_case_def_empty_lines", cast=bool),
 ]
 
 
@@ -149,6 +153,7 @@ def Lavender():
   mode = lavender.FileMode(
     line_length=configs["line_length"],
     string_normalization=configs["string_normalization"],
+    special_case_def_empty_lines=configs["special_case_def_empty_lines"],
     is_pyi=vim.current.buffer.name.endswith('.pyi'),
   )
 
